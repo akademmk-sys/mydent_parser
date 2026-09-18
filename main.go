@@ -37,4 +37,21 @@ func main() {
 		Parallelism: 2,
 	})
 
+	DATA := make(map[string]*Category)
+
+	c.OnHTML("ul.card-catalog__subcategory-list2 a.link-subcategory", func(h *colly.HTMLElement) {
+		name := h.Text
+		link := h.Request.AbsoluteURL(h.Attr("href"))
+
+		DATA[name] = &Category{
+			Name:     name,
+			Link:     link,
+			Products: make(map[string]Product),
+		}
+	})
+
+	c.Visit("https://mydent24.ru/catalog/")
+
+	c.Wait()
+
 }
