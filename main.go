@@ -63,9 +63,9 @@ func main() {
 	pc.OnHTML("div.products-row div.product-card", func(h *colly.HTMLElement) {
 		currentURL := h.Request.URL
 		baseSupCategryURl := currentURL.Scheme + "://" + currentURL.Host + currentURL.Path
-		imgLink := h.Request.AbsoluteURL(h.ChildAttr("product-card-img-container img", "src"))
+		imgLink := h.Request.AbsoluteURL(h.ChildAttr(".product-card-img-container img", "src"))
 		name := strings.TrimSpace(h.ChildText("h3.product-card-title"))
-		rawPrice := h.ChildText("product-card-price .price")
+		rawPrice := h.ChildText(".product-card-price .price")
 		price := strings.TrimSpace(strings.ReplaceAll(rawPrice, "\u00a0", " "))
 		link := h.Request.AbsoluteURL(h.ChildAttr("a.product-link", "href"))
 
