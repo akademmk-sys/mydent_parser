@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -24,6 +25,7 @@ type Category struct {
 }
 
 func main() {
+	var mu sync.Mutex
 	c := colly.NewCollector(
 		colly.AllowedDomains("mydent24.ru"),
 		colly.Async(true),
@@ -40,18 +42,19 @@ func main() {
 	DATA := make(map[string]*Category)
 
 	c.OnHTML("ul.card-catalog__subcategory-list2 a.link-subcategory", func(h *colly.HTMLElement) {
+
 		name := h.Text
 		link := h.Request.AbsoluteURL(h.Attr("href"))
-
+		mu.Lock()
 		DATA[name] = &Category{
 			Name:     name,
 			Link:     link,
 			Products: make(map[string]Product),
 		}
+		mu.Unlock()
 	})
 
 	c.Visit("https://mydent24.ru/catalog/")
-
 	c.Wait()
-
+	// fmt.Println(DATA)
 }
