@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/xuri/excelize/v2"
 )
 
 type Product struct {
@@ -165,4 +167,40 @@ func main() {
 	for k, v := range DATA {
 		fmt.Printf("Категория: %s (Всего товаров: %d)\n", k, len(v.Products))
 	}
+	exl := excelize.NewFile()
+	defer func() {
+		if err := exl.Close(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	exl.SetCellValue("Sheet1", "A1", "Категория")
+	exl.SetCellValue("Sheet1", "B1", "Ссылка на категрию")
+	exl.SetCellValue("Sheet1", "C1", "Товар")
+	exl.SetCellValue("Sheet1", "D1", "Ссылка на товар")
+	exl.SetCellValue("Sheet1", "E1", "Ссылка на картинку")
+	exl.SetCellValue("Sheet1", "F1", "Цена")
+	exl.SetCellValue("Sheet1", "G1", "Артикул")
+	exl.SetCellValue("Sheet1", "H1", "Брэнд")
+	exl.SetCellValue("Sheet1", "I1", "Вес")
+	exl.SetCellValue("Sheet1", "J1", "Рег. удостоверение")
+	exl.SetCellValue("Sheet1", "K1", "Описание")
+	row := 2
+	for _, cat := range DATA {
+		for _, prod := range cat.Products {
+			exl.SetCellValue("Sheet1", "A"+strconv.Itoa(row), cat.Name)
+			exl.SetCellValue("Sheet1", "B"+strconv.Itoa(row), cat.Link)
+			exl.SetCellValue("Sheet1", "C"+strconv.Itoa(row), prod.PName)
+			exl.SetCellValue("Sheet1", "D"+strconv.Itoa(row), prod.PLink)
+			exl.SetCellValue("Sheet1", "E"+strconv.Itoa(row), prod.ImgLink)
+			exl.SetCellValue("Sheet1", "F"+strconv.Itoa(row), prod.Price)
+			exl.SetCellValue("Sheet1", "G"+strconv.Itoa(row), prod.PartNumber)
+			exl.SetCellValue("Sheet1", "H"+strconv.Itoa(row), prod.Brand)
+			exl.SetCellValue("Sheet1", "I"+strconv.Itoa(row), prod.Weight)
+			exl.SetCellValue("Sheet1", "J"+strconv.Itoa(row), prod.Passport)
+			exl.SetCellValue("Sheet1", "K"+strconv.Itoa(row), prod.Description)
+			row++
+		}
+	}
+	exl.SaveAs("mydent_db.xlsx")
 }
