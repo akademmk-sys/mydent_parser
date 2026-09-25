@@ -45,7 +45,7 @@ func main() {
 		Delay:       3 * time.Second,
 		RandomDelay: 1 * time.Second,
 	})
-
+	catColl.SetRequestTimeout(60 * time.Second)
 	// Глобальное хранилище: Ключ = очищенный URL категории, Значение = указатель на Category
 	DATA := make(map[string]*Category)
 
