@@ -85,7 +85,7 @@ func main() {
 		baseSupCategryURl := currentURL.Scheme + "://" + currentURL.Host + currentURL.Path
 
 		// Достаем картинку (.product-card-img-container img) и преобразуем в абсолютный URL
-		imgLink := h.Request.AbsoluteURL(h.ChildAttr(".product-card-img-container img", "src"))
+		// imgLink := h.Request.AbsoluteURL(h.ChildAttr(".product-card-img-container img", "src"))
 
 		// Достаем название товара и удаляем лишние пробелы/переносы
 		name := strings.TrimSpace(h.ChildText("h3.product-card-title"))
@@ -98,10 +98,10 @@ func main() {
 		link := h.Request.AbsoluteURL(h.ChildAttr("a.product-link", "href"))
 
 		product := Product{
-			PName:   name,
-			PLink:   link,
-			Price:   price,
-			ImgLink: imgLink,
+			PName: name,
+			PLink: link,
+			Price: price,
+			// ImgLink: imgLink,
 		}
 
 		// Запрещаем другим горутинам одновременно писать в DATA
@@ -127,6 +127,14 @@ func main() {
 		weight := strings.TrimSpace(h.ChildText("div.product-property[class~='code-'] div.property-val"))
 		descript := strings.TrimSpace(h.ChildText("div.product-description div.block-info-text div.text"))
 
+		rowImgLinks := h.ChildAttrs("div.owl-stage-outer a.gallery-slide", "href")
+		fullImgLinks := make([]string, 0, len(rowImgLinks))
+		for _, el := range rowImgLinks {
+			trimmed := strings.TrimSpace(el)
+			fullImgLinks = append(fullImgLinks, h.Request.AbsoluteURL(trimmed))
+		}
+		productImgLinks := strings.Join(fullImgLinks, "\n")
+
 		mu.Lock()
 		for _, cat := range DATA {
 			if prod, ok := cat.Products[currentURL]; ok {
@@ -135,6 +143,7 @@ func main() {
 				prod.Brand = brand
 				prod.Weight = weight
 				prod.Description = descript
+				prod.ImgLink = productImgLinks
 
 				cat.Products[currentURL] = prod
 			}
