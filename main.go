@@ -44,6 +44,7 @@ func errorHandler(r *colly.Response, err error) {
 		r.Request.Retry()
 	}
 }
+
 func main() {
 	var mu sync.Mutex
 	catColl := colly.NewCollector(
@@ -139,7 +140,7 @@ func main() {
 		weight := strings.TrimSpace(h.ChildText("div.product-property[class~='code-'] div.property-val"))
 		descript := strings.TrimSpace(h.ChildText("div.product-description div.block-info-text div.text"))
 
-		rowImgLinks := h.ChildAttrs("div.owl-stage-outer a.gallery-slide", "href")
+		rowImgLinks := h.ChildAttrs("div.gallery-top a.gallery-slide", "href")
 		fullImgLinks := make([]string, 0, len(rowImgLinks))
 		for _, el := range rowImgLinks {
 			trimmed := strings.TrimSpace(el)
