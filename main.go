@@ -30,7 +30,19 @@ type Category struct {
 }
 
 func errorHandler(r *colly.Response, err error) {
-	fmt.Println("Ошибка запроса:", r.StatusCode, err)
+	fmt.Printf("Ошибка запроса: [%d] на %s: %v\n", r.StatusCode, r.Request.URL, err)
+
+	v := r.Request.Ctx.Get("retry_count")
+	retryCount := 0
+	if v != "" {
+		retryCount, _ = strconv.Atoi(v)
+	}
+	if retryCount < 3 {
+		retryCount++
+		fmt.Printf("retry request (%d/3) on URL: %s\n", retryCount, r.Request.URL)
+		r.Request.Ctx.Put("retry_count", strconv.Itoa(retryCount))
+		r.Request.Retry()
+	}
 }
 func main() {
 	var mu sync.Mutex
